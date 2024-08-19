@@ -26,13 +26,14 @@ class Cli {
             ])
             .then((answers) => {
                 if (answers.action === 'View All Emplpoyees') {
-                    const sql = 'SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT (m.first_name, " ", m.last_name) as manager FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON r.department = d.id LEFT JOIN employee m ON e.manager_id = m.id;';
+                    const sql = `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT (m.first_name, ' ', m.last_name) as manager FROM employee e JOIN role r ON e.role_id = r.id JOIN department d ON r.department = d.id LEFT JOIN employee m ON e.manager_id = m.id;`;
                     pool.query(sql, (err: Error, result: QueryResult) => {
                         if (err) {
-                            console.log({ error: err.message });
-                            return result;
+                            console.log({ err });
+                        }else if (result){
+                            console.log(result.rows);
                         }
-                    })
+                    });this.makeSelection()
                 } else if (answers.action === 'Add Employee') {
 
                     this.addEmployee()
@@ -45,24 +46,26 @@ class Cli {
                     const sql = 'SELECT role.id, title, department.name AS department, salary FROM role JOIN department ON department.id = role.department;';
                     pool.query(sql, (err: Error, result: QueryResult) => {
                         if (err) {
-                            console.log({ error: err.message });
-                            return result;
+                            console.log({ err });
+                        }else if (result){
+                            console.log(result.rows);
                         }
-                    })
+                });this.makeSelection()
                 } else if (answers.action === 'Add Role') {
                     this.addRole()
                 } else if (answers.action === 'View All Departments') {
                     const sql = 'SELECT * FROM department';
                     pool.query(sql, (err: Error, result: QueryResult) => {
                         if (err) {
-                            console.log({ error: err.message });
-                            return result;
+                            console.log({ err });
+                        }else if (result){
+                            console.log(result.rows);
                         }
-                    })
+                });this.makeSelection()
                 } else if (answers.action === 'Add Department') {
                     this.addDepartment()
                 } else {
-                    pool.query('/q')
+                    pool.query('\q')
                 }
             })
     }
@@ -109,10 +112,11 @@ class Cli {
                     const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)`;
                     pool.query(sql, [answers.employeeFirstName, answers.employeeLastName, Number(roleId), answers.employeeManager.value], (err: Error, result: QueryResult) => {
                         if (err) {
-                            console.log({ error: err.message });
-                            return result;
+                            console.log({ err });
+                        }else if (result){
+                            console.log(`${answers.employeeFirstName} ${answers.employeeLastName} added to the database`);
                         }
-                    })
+                });this.makeSelection()
                 };
             })
     }
@@ -151,10 +155,11 @@ class Cli {
             const sql = 'UPDATE employee SET role_id = $1 WHERE id = $2';
             pool.query(sql, [roleId, employeeId], (err: Error, result: QueryResult) => {
                 if (err) {
-                    console.log({ error: err.message });
-                    return result;
+                    console.log({ err });
+                }else if (result){
+                    console.log(`Updated ${employeeFirstName} ${employeeLastName}'s role.`)
                 }
-            })
+        });this.makeSelection()
         };
     })
     }
@@ -187,12 +192,13 @@ class Cli {
                     const sql = `INSERT INTO role (title, salary, department) VALUES ($1, $2, $3)`;
                     pool.query(sql, [answers.roleTitle, Number(answers.roleSalary), Number(departmentId)], (err: Error, result: QueryResult) => {
                         if (err) {
-                            console.log({ error: err.message });
-                            return result;
+                            console.log({ err });
+                        }else if (result){
+                            console.log(`Role ${answers.roleTitle} added.`);
                         }
-                    })
+                })
                 };
-            })
+            });this.makeSelection()
     }
     async addDepartment(): Promise<void> {
         inquirer
@@ -207,11 +213,12 @@ class Cli {
                 const sql = `INSERT INTO department (name) VALUES ($1)`;
                 pool.query(sql, [answers.departmentName], (err: Error, result: QueryResult) => {
                     if (err) {
-                        console.log({ error: err.message });
-                        return result;
+                        console.log({ err });
+                    }else if (result){
+                        console.log(`Department ${answers.departmentName} added`);
                     }
-                });
-            })
+            });
+            });this.makeSelection()
     }
 
 
