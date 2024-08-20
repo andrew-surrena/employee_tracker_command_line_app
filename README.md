@@ -38,7 +38,7 @@ Answer the prompts provided to add an Employee, add a Role, or add a Department 
 
 ### Access video demo: 
 
-* 
+* https://youtu.be/WmUd5jjpS7U
 
 ## Credits
 Special thanks to the following instructors for their help:
